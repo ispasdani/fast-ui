@@ -16,6 +16,7 @@ import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useCodeStore } from "@/store/codeStore";
 import { useUser } from "@clerk/nextjs";
+import LoadingSpinner from "../loadingSpinner";
 
 interface AIModel {
   name: string;
@@ -36,6 +37,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
 
   const { user } = useUser();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const setCodeData = useCodeStore((state) => state.setCodeData);
   const codeData = useCodeStore((state) => state.codeData);
   const generateCodeWithGemini = useAction(
@@ -82,6 +84,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
     )
       return;
 
+    setLoading(true);
+
     if (codeData.selectedModel === "Gemini Google") {
       try {
         const { imageBase64, description } = useCodeStore.getState().codeData;
@@ -103,6 +107,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
         onGenerateSuccess();
       } catch (error) {
         console.error("Error generating code:", error);
+      } finally {
+        setLoading(false); // ← always turn it off when done
       }
     }
     // Add logic for other models if needed later.
@@ -236,11 +242,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
           disabled={
             (!previewUrl && !codeData.imageBase64) ||
             !codeData.selectedModel ||
+            loading ||
             !user
           }
         >
-          <WandSparkles className="mr-2" />{" "}
-          {codeData.generatedCode ? "Regenerate" : "Convert To Code"}
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <WandSparkles className="mr-2" />{" "}
+              {codeData.generatedCode ? "Regenerate" : "Convert To Code"}
+            </>
+          )}
         </Button>
       </div>
     </div>
