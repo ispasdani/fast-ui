@@ -1,4 +1,4 @@
-import { Bot, CreditCard, Home, LayoutDashboard } from "lucide-react";
+import { CreditCard, Home, LayoutDashboard, CodeXml } from "lucide-react";
 
 export const items = [
   {
@@ -7,14 +7,14 @@ export const items = [
     icon: Home,
   },
   {
-    title: "Wireframe to code",
-    url: "/wireframe",
-    icon: LayoutDashboard,
+    title: "Wireframe to Code",
+    url: "/code-generator",
+    icon: CodeXml,
   },
   {
-    title: "Template",
-    url: "/template",
-    icon: Bot,
+    title: "Wireframe to Mockup",
+    url: "/mockup-generator",
+    icon: LayoutDashboard,
   },
   {
     title: "Billing",
