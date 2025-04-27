@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.18.0",
+    "@codesandbox/sandpack-react": "^2.20.0",
     "@google/generative-ai": "^0.24.0",
     "@radix-ui/react-dialog": "^1.1.11",
     "@radix-ui/react-select": "^2.2.2",
