@@ -24,7 +24,9 @@ const ViewResult = () => {
         }}
         files={{
           "/App.js": `export default function App() {
-    return <h1>Hello Sandpack</h1>
+    return <div className="flex justify-center items-center w-full h-full">
+        <h1>Use AI Generator first to display your code here...</h1>
+    </div>
   }`,
         }}
       />
