@@ -5,7 +5,7 @@ import { DEPENDENCY } from "@/consts/sandpackDependecy";
 
 const ViewResult = () => {
   const codeData = useCodeStore((state) => state.codeData);
-  console.log(codeData.generatedCode);
+  console.log(codeData.generatedCode); // splitting the code here
 
   return (
     <div>
