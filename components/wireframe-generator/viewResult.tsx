@@ -31,6 +31,7 @@ const ViewResult = () => {
       cleanCode = 'import React from "react";\n' + cleanCode;
     }
 
+    // Keep comments on
     // Handle component export
     if (!cleanCode.includes("export default")) {
       const componentMatch = cleanCode.match(/function\s+([A-Z][a-zA-Z0-9]*)/);
