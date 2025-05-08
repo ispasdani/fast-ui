@@ -23,6 +23,11 @@ interface AIModel {
   icon: string;
 }
 
+interface CodeType {
+  name: string;
+  value: string;
+}
+
 // Define props to include our callback
 interface ImageUploadProps {
   onGenerateSuccess: () => void;
@@ -33,6 +38,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
     { name: "Gemini Google", icon: "/icons/google.png" },
     { name: "OpenAI", icon: "/icons/openai.svg" },
     { name: "Deepseek", icon: "/icons/deepseek.png" },
+  ];
+
+  const CodeTypeList: CodeType[] = [
+    { name: "React JS", value: "react" },
+    { name: "Angular JS", value: "angular" },
+    { name: "Vue JS", value: "vue" },
+    { name: "HTML + CSS", value: "html" },
+    { name: "Vanilla JS", value: "vanilla" },
+    { name: "Svelte", value: "svelte" },
   ];
 
   const { user } = useUser();
@@ -52,6 +66,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
     setCodeData({
       selectedModel: modelValue,
       selectedModelIcon: selectedModelData?.icon || "",
+    });
+  };
+
+  // Handle the code type change
+  const handleCodeTypeChange = (codeTypeValue: string) => {
+    setCodeData({
+      codeType: codeTypeValue,
     });
   };
 
@@ -80,6 +101,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
     if (
       (!previewUrl && !codeData.imageBase64) ||
       !codeData.selectedModel ||
+      !codeData.codeType ||
       !user
     )
       return;
@@ -88,11 +110,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
 
     if (codeData.selectedModel === "Gemini Google") {
       try {
-        const { imageBase64, description } = useCodeStore.getState().codeData;
+        const { imageBase64, description, codeType } =
+          useCodeStore.getState().codeData;
         const userId = user.id;
         const generatedCode = await generateCodeWithGemini({
           imageBase64,
           description: description || undefined,
+          codeType: codeType || "react", // Pass the selected code type
           userId,
         });
         // Update the store with the new generated code; other values remain unchanged.
@@ -102,6 +126,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
           generatedCode,
           selectedModel: codeData.selectedModel,
           selectedModelIcon: codeData.selectedModelIcon,
+          codeType,
         });
         // Switch the active tab to "reviewResult" after code generation succeeds.
         onGenerateSuccess();
@@ -122,14 +147,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
       generatedCode: "",
       selectedModel: "",
       selectedModelIcon: "",
+      codeType: "react", // Reset to default code type
     });
   };
 
   if (!user) {
     return <div>Loading...</div>;
   }
-
-  console.log("codeData", codeData);
 
   return (
     <div className="mt-3">
@@ -215,6 +239,27 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
             </SelectContent>
           </Select>
 
+          {/* New Code Type Dropdown */}
+          <p className="font-bold text-lg mt-7">Select Code Type</p>
+          <Select
+            onValueChange={handleCodeTypeChange}
+            defaultValue={codeData.codeType || "react"}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Code Type">
+                {CodeTypeList.find((type) => type.value === codeData.codeType)
+                  ?.name || "Select Code Type"}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {CodeTypeList.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <p className="font-bold text-lg mt-7">
             Enter description about your desired code
           </p>
@@ -225,10 +270,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
             onChange={(e) =>
               setCodeData({
                 description: e.target.value,
-                imageBase64: codeData.imageBase64,
-                generatedCode: codeData.generatedCode,
-                selectedModel: codeData.selectedModel,
-                selectedModelIcon: codeData.selectedModelIcon,
               })
             }
           />
@@ -242,6 +283,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onGenerateSuccess }) => {
           disabled={
             (!previewUrl && !codeData.imageBase64) ||
             !codeData.selectedModel ||
+            !codeData.codeType ||
             loading ||
             !user
           }

@@ -8,10 +8,13 @@ import ViewResult from "./viewResult";
 const DesignToCode = () => {
   // Control the active tab using state
   const [activeTab, setActiveTab] = useState("aiGenerator");
+  // Track whether the result has been generated
+  const [isResultGenerated, setIsResultGenerated] = useState(false);
 
   // Callback to be triggered when generation is successful
   const handleGenerateSuccess = () => {
-    setActiveTab("reviewResult");
+    setIsResultGenerated(true); // Enable the Review Result tab
+    setActiveTab("reviewResult"); // Switch to Review Result tab
   };
 
   return (
@@ -24,7 +27,11 @@ const DesignToCode = () => {
         <TabsTrigger className="h-10 cursor-pointer" value="aiGenerator">
           AI Generator
         </TabsTrigger>
-        <TabsTrigger className="h-10 cursor-pointer" value="reviewResult">
+        <TabsTrigger
+          className="h-10 cursor-pointer"
+          value="reviewResult"
+          disabled={!isResultGenerated} // Enable only after generation
+        >
           Review Result
         </TabsTrigger>
       </TabsList>
